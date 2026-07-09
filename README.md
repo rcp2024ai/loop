@@ -50,7 +50,7 @@ procrastination patterns week over week.
 
 ```bash
 cd extension
-npm test          # 34 tests: state machine, protocol strings, validators
+npm test          # 36 tests: state machine, protocol strings, validators, DNA bars
 ```
 
 No build step. No frameworks. Vanilla ES modules, loaded directly by Chrome.

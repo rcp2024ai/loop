@@ -39,7 +39,11 @@ Click the **⚙ gear icon** at the top of the sidebar — that opens the full Se
 
 This exercises every phase in one sitting.
 
-1. **Dump.** The sidebar opens on "Phase 1 — Brain dump". Type something messy — or
+1. **Dump.** On first ever open you'll see a short **welcome** explaining the 5-step
+   flow with a **"Try it with an example"** button — tap it to auto-fill a realistic
+   messy dump, then hit "That's everything →" to watch triage work instantly. (The
+   welcome disappears once you've closed your first loop.) Otherwise, type something
+   messy — or
    tap the **🎙 mic button** next to the textarea and just talk (Chrome will ask for
    microphone access the first time; click Allow). Either way, real is better than tidy:
    > fix the gazoo routing bug, write readme for odin, update landing page hero, email the supplier about pricing, learn more about the new claude model, renew the domain

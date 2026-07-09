@@ -2,7 +2,8 @@
 
 import { Store, DEFAULT_SETTINGS } from './lib/state.js';
 import { makeLlm, DEFAULT_MODELS, LlmError } from './lib/llm.js';
-import { weeklyReview } from './lib/patterns.js';
+import { dnaBars } from './lib/patterns.js';
+import { dnaCard } from './lib/dna-view.js';
 
 const store = new Store(chrome.storage.local);
 const $ = (id) => document.getElementById(id);
@@ -141,22 +142,7 @@ function flash(msg, ok) {
 }
 
 function renderReview(patterns) {
-  const wr = weeklyReview(patterns);
-  if (!wr.top.length) return;
-  const box = $('review');
-  box.replaceChildren();
-  for (const t of wr.top) {
-    const bar = document.createElement('div');
-    bar.className = 'bar';
-    const label = document.createElement('span');
-    label.textContent = t.label;
-    const count = document.createElement('span');
-    count.textContent = `×${t.count}`;
-    bar.append(label, count);
-    box.append(bar);
-  }
-  const change = document.createElement('div');
-  change.className = 'change';
-  change.textContent = `One change: ${wr.proposedChange}`;
-  box.append(change);
+  const dna = dnaBars(patterns);
+  if (!dna.bars.length) return; // keep the inviting empty-state copy in the HTML
+  $('review').replaceChildren(dnaCard(dna));
 }

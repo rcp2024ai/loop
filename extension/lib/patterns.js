@@ -14,6 +14,17 @@ export const BLOCKER_LABELS = {
   NO_STAKES: 'No stakes — nothing happens if it slips'
 };
 
+// A distinct on-brand color per blocker, so the DNA bars read at a glance.
+export const BLOCKER_COLORS = {
+  TOO_VAGUE: '#F5A623',      // gold
+  TOO_BIG: '#2563EB',        // blue
+  PERFECTIONISM: '#60EFFF',  // cyan
+  CONTEXT_SWITCH: '#A78BFA', // violet
+  WAITING: '#F87171',        // red
+  LOW_ENERGY: '#FBBF24',     // amber
+  NO_STAKES: '#34D399'       // green
+};
+
 // One concrete system change per dominant blocker ("Your Procrastination DNA").
 export const SYSTEM_CHANGES = {
   TOO_VAGUE: 'During triage, refuse any TODAY item without a <10-word first action.',
@@ -56,5 +67,22 @@ export function weeklyReview(patterns, now = new Date()) {
     totalStalls: week.length,
     top,
     proposedChange: top.length ? SYSTEM_CHANGES[top[0].blocker] : null
+  };
+}
+
+// View-model for the DNA visualization: the weekly review plus, per top
+// blocker, a 0-100 bar width (relative to the most frequent) and its color.
+// Pure + presentation-agnostic so both the Settings page and the sidebar's
+// weekly review render identical bars from one tested source.
+export function dnaBars(patterns, now = new Date()) {
+  const wr = weeklyReview(patterns, now);
+  const max = wr.top.reduce((m, t) => Math.max(m, t.count), 0) || 1;
+  return {
+    ...wr,
+    bars: wr.top.map((t) => ({
+      ...t,
+      pct: Math.round((t.count / max) * 100),
+      color: BLOCKER_COLORS[t.blocker] || '#8FA3C0'
+    }))
   };
 }
