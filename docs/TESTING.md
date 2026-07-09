@@ -22,9 +22,11 @@ Click the **⚙ gear icon** at the top of the sidebar — that opens the full Se
 1. Go to [openrouter.ai](https://openrouter.ai) → sign up (free) → **Keys** → **Create Key**.
 2. Copy the key (starts with `sk-or-`).
 3. Back in LOOP Settings, paste it into **API key**.
-4. Leave **Model** blank (uses a sensible default), or paste any slug from
-   [openrouter.ai/models](https://openrouter.ai/models) — models suffixed `:free` cost
-   nothing.
+4. Pick a **Model** from the dropdown — plain-language tiers, no slugs to type:
+   ⚡ Fast & cheap (GPT-4o mini) · ⚖️ Balanced (Claude Haiku 4.5, the default) ·
+   🧠 Most capable (Claude Sonnet 4.5) · 🆓 Free (Llama 3.3 70B). Pick **✍️ Custom…**
+   to type any slug from [openrouter.ai/models](https://openrouter.ai/models) yourself.
+   The **"Using: …"** line always shows the exact model that will be sent.
 5. Click **Test connection** — should show "Connected: OK" within a couple seconds.
 6. Click **Save**.
 

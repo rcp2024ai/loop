@@ -29,7 +29,9 @@ procrastination patterns week over week.
 4. Click the LOOP toolbar icon → the sidebar opens.
 5. Gear icon → Settings → pick a provider (OpenRouter is preselected):
    - **OpenRouter** (recommended) — one key, 100+ models (Claude, GPT, Llama, and more).
-     Free account at [openrouter.ai](https://openrouter.ai) → Keys → Create Key.
+     Free account at [openrouter.ai](https://openrouter.ai) → Keys → Create Key. Pick a
+     model from a plain-language dropdown (fast/cheap → most capable, plus a free tier) —
+     no slugs to memorize; a "Custom…" option accepts any slug for power users.
    - **Anthropic / OpenAI** — paste your own key if you already have one with them.
    - **Ollama** — free local inference, zero cost (`ollama serve` must be running).
 6. Type — or tap the 🎙 mic and just talk — your first brain dump. Hit **That's everything →**.

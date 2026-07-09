@@ -41,11 +41,21 @@
       <span>API key (stored only on this device)</span>
       <input type="password" id="apiKey" placeholder="sk-…">
     </div>
-    <div class="frow">
-      <span>Model (blank = sensible default)</span>
-      <input type="text" id="model" placeholder="">
-      <div class="hint" id="model-effective"></div>
+    <div class="frow" id="row-model-preset">
+      <span>Model</span>
+      <select id="model-preset">
+        <option value="openai/gpt-4o-mini">⚡ Fast &amp; cheap — GPT-4o mini</option>
+        <option value="anthropic/claude-haiku-4.5">⚖️ Balanced — Claude Haiku 4.5 (recommended)</option>
+        <option value="anthropic/claude-sonnet-4.5">🧠 Most capable — Claude Sonnet 4.5</option>
+        <option value="meta-llama/llama-3.3-70b-instruct:free">🆓 Free — Llama 3.3 70B</option>
+        <option value="__custom__">✍️ Custom… (any OpenRouter model)</option>
+      </select>
     </div>
+    <div class="frow" id="row-model-custom">
+      <span id="model-custom-label">Custom model slug</span>
+      <input type="text" id="model" placeholder="">
+    </div>
+    <div class="hint" id="model-effective"></div>
     <div class="frow" id="row-ollama">
       <span>Ollama URL</span>
       <input type="text" id="ollamaUrl" placeholder="http://localhost:11434">
