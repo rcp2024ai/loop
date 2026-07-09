@@ -1,0 +1,10 @@
+{
+  "name": "loop-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "LOOP by BetterWayAI — Chrome side-panel extension. Close every task, every day.",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

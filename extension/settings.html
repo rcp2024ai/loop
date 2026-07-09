@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LOOP — Settings</title>
+  <link rel="stylesheet" href="sidebar.css">
+  <style>
+    body { max-width: 520px; padding: 0 0 24px; }
+    .section { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .frow { display: flex; flex-direction: column; gap: 4px; }
+    .frow > span { font-size: 12px; color: var(--dim); }
+    .inline { flex-direction: row; align-items: center; gap: 8px; }
+    .inline input { width: auto; }
+    .usage { font-family: var(--font-mono); font-size: 12px; color: var(--dim); }
+    #test-result { font-size: 13px; }
+    #test-result.ok { color: var(--green); }
+    #test-result.bad { color: var(--red); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="icons/48.png" alt="" class="mark">
+      <span class="word">LOOP — SETTINGS</span>
+    </div>
+  </header>
+
+  <div class="section">
+    <div class="eyebrow">AI provider (bring your own key)</div>
+    <div class="frow">
+      <span>Provider</span>
+      <select id="provider">
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="openai">OpenAI</option>
+        <option value="ollama">Ollama (local, free)</option>
+      </select>
+    </div>
+    <div class="frow" id="row-key">
+      <span>API key (stored only on this device)</span>
+      <input type="password" id="apiKey" placeholder="sk-…">
+    </div>
+    <div class="frow">
+      <span>Model (blank = sensible default)</span>
+      <input type="text" id="model" placeholder="">
+    </div>
+    <div class="frow" id="row-ollama">
+      <span>Ollama URL</span>
+      <input type="text" id="ollamaUrl" placeholder="http://localhost:11434">
+    </div>
+    <div class="cmdbar" style="padding:0">
+      <button class="btn" id="btn-test">Test connection</button>
+      <button class="btn primary" id="btn-save">Save</button>
+    </div>
+    <div id="test-result"></div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">Schedule</div>
+    <div class="frow"><span>Morning dump reminder</span><input type="time" id="dumpTime"></div>
+    <div class="frow"><span>Close-the-loop reminder</span><input type="time" id="closeTime"></div>
+    <label class="frow inline">
+      <input type="checkbox" id="nudges">
+      <span>Nudges (idle + tab-switching check-ins during focus)</span>
+    </label>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">Usage</div>
+    <div class="usage" id="usage"></div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">Your procrastination DNA — last 7 days</div>
+    <div class="review" id="review"><div class="hint">No pattern data yet. Close a few loops first.</div></div>
+  </div>
+
+  <div class="byline">by <a href="https://betterwayai.com" target="_blank" rel="noopener noreferrer">betterwayai</a></div>
+  <script type="module" src="settings.js"></script>
+</body>
+</html>
