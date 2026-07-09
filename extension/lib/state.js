@@ -12,7 +12,11 @@ export const BLOCKERS = [
 ];
 
 export const DEFAULT_SETTINGS = {
-  provider: 'anthropic',            // anthropic | openai | ollama
+  // OpenRouter is the default: one key covers 100+ models (Claude, GPT,
+  // Llama, and more), which is the simplest on-ramp for a first install.
+  // Switch to a direct provider or Ollama anytime in Settings — nothing
+  // else in the app depends on which one is picked.
+  provider: 'openrouter',            // openrouter | anthropic | openai | ollama
   apiKey: '',
   model: '',                        // blank = provider default
   ollamaUrl: 'http://localhost:11434',

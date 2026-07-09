@@ -47,9 +47,18 @@ it to 3 (Hard Rule 2 is enforced in code, not trust); if it invents a bucket cal
 
 The extension has no server. Your API key lives in `chrome.storage.local` — a small
 private database Chrome gives each extension, stored on your machine only. Calls go
-straight from your browser to Anthropic/OpenAI, or to **Ollama** (an app that runs
-models locally — free, private, no key at all). That's why the free tier costs us
-nothing to operate.
+straight from your browser to your chosen provider:
+
+- **OpenRouter** (the default) — one key, one bill, 100+ models from many labs behind
+  it. Good default for a beginner: you're not locked into picking "the right" provider
+  up front, and some models there are free.
+- **Anthropic / OpenAI directly** — paste a key if you already have an account with
+  either and prefer to use it directly.
+- **Ollama** — an app that runs models locally on your machine. Free, private, no key
+  at all.
+
+That's why the free tier costs us nothing to operate — the bill (if any) goes straight
+from you to your chosen provider; we never sit in the middle of it.
 
 ## File-by-file
 
@@ -96,4 +105,6 @@ success bar is that the loop closes daily — not that the code is clever.
 - **State machine** — code that's always in exactly one named state, with defined moves between states.
 - **BYO key** — you supply your own AI provider key; the product ships no server.
 - **Ollama** — free app that runs open models locally on your machine.
+- **OpenRouter** — one API that proxies 100+ models from many providers behind a
+  single key and a single bill.
 - **Strict JSON** — machine-readable structured output we can validate, instead of prose we'd have to guess at.

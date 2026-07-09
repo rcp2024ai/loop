@@ -1,12 +1,19 @@
 // lib/llm.js — ALL AI API calls go through here (CLAUDE.md rule: no direct
 // fetch calls anywhere else). BYO-key model: the user supplies their own
-// Anthropic or OpenAI key, or points at a local Ollama server for zero-cost
-// inference. The system prompt is loaded from prompts/system-prompt.md —
-// never inlined in code.
+// Anthropic, OpenAI, or OpenRouter key, or points at a local Ollama server
+// for zero-cost inference. The system prompt is loaded from
+// prompts/system-prompt.md — never inlined in code.
+
+const PROVIDERS = ['openrouter', 'anthropic', 'openai', 'ollama'];
 
 export const DEFAULT_MODELS = {
   anthropic: 'claude-haiku-4-5',
   openai: 'gpt-4o-mini',
+  // OpenRouter proxies 100+ models behind one key, addressed as
+  // "provider/model". This default is a solid, inexpensive general model —
+  // browse current options (including free ones, suffixed ":free") at
+  // openrouter.ai/models and paste any slug into the Model field.
+  openrouter: 'anthropic/claude-3.5-haiku',
   ollama: 'llama3.2'
 };
 
@@ -30,14 +37,23 @@ export async function loadSystemPrompt() {
 
 // Returns an async ({ instruction, content }) => text function bound to the
 // user's settings, recording token usage through `onUsage`.
+//
+// Precondition checks (provider is recognized; a key is present unless
+// running Ollama) run BEFORE any I/O — including the local system-prompt
+// read — so a misconfigured provider fails fast with a friendly LlmError
+// rather than a raw fetch/runtime error.
 export function makeLlm(settings, onUsage) {
   return async ({ instruction, content }) => {
+    if (!PROVIDERS.includes(settings.provider)) {
+      throw new LlmError(`Unknown provider: ${settings.provider}`);
+    }
+    if (settings.provider !== 'ollama') requireKey(settings);
+
     const system = await loadSystemPrompt();
     const user = `${instruction}\n\n${content}`;
     const model = settings.model || DEFAULT_MODELS[settings.provider];
 
     if (settings.provider === 'anthropic') {
-      requireKey(settings);
       const res = await post(
         'https://api.anthropic.com/v1/messages',
         {
@@ -58,22 +74,29 @@ export function makeLlm(settings, onUsage) {
       return (res.content || []).map((b) => b.text || '').join('');
     }
 
-    if (settings.provider === 'openai') {
-      requireKey(settings);
-      const res = await post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-          'content-type': 'application/json',
-          authorization: `Bearer ${settings.apiKey}`
-        },
-        {
-          model,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user }
-          ]
-        }
-      );
+    if (settings.provider === 'openai' || settings.provider === 'openrouter') {
+      // OpenRouter speaks the OpenAI Chat Completions format, so both
+      // providers share one branch — only the URL and headers differ.
+      const url = settings.provider === 'openrouter'
+        ? 'https://openrouter.ai/api/v1/chat/completions'
+        : 'https://api.openai.com/v1/chat/completions';
+      const headers = {
+        'content-type': 'application/json',
+        authorization: `Bearer ${settings.apiKey}`
+      };
+      if (settings.provider === 'openrouter') {
+        // Optional, OpenRouter-recommended attribution headers — purely
+        // cosmetic (shows up in their dashboards), no effect on the response.
+        headers['HTTP-Referer'] = 'https://betterwayai.com';
+        headers['X-Title'] = 'LOOP by BetterWayAI';
+      }
+      const res = await post(url, headers, {
+        model,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user }
+        ]
+      });
       onUsage?.(
         res.usage?.prompt_tokens || 0,
         res.usage?.completion_tokens || 0
@@ -81,25 +104,22 @@ export function makeLlm(settings, onUsage) {
       return res.choices?.[0]?.message?.content || '';
     }
 
-    if (settings.provider === 'ollama') {
-      const base = (settings.ollamaUrl || 'http://localhost:11434').replace(/\/$/, '');
-      const res = await post(
-        `${base}/api/chat`,
-        { 'content-type': 'application/json' },
-        {
-          model,
-          stream: false,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user }
-          ]
-        }
-      );
-      onUsage?.(res.prompt_eval_count || 0, res.eval_count || 0);
-      return res.message?.content || '';
-    }
-
-    throw new LlmError(`Unknown provider: ${settings.provider}`);
+    // ollama — the only provider that reaches here without an API key.
+    const base = (settings.ollamaUrl || 'http://localhost:11434').replace(/\/$/, '');
+    const res = await post(
+      `${base}/api/chat`,
+      { 'content-type': 'application/json' },
+      {
+        model,
+        stream: false,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user }
+        ]
+      }
+    );
+    onUsage?.(res.prompt_eval_count || 0, res.eval_count || 0);
+    return res.message?.content || '';
   };
 }
 
