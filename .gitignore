@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Generated extension icons — regenerate with: python3 tools/make_icons.py
+extension/icons/*.png
+
+# Build / release artifacts
+*.zip
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
