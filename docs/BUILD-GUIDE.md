@@ -47,9 +47,18 @@ it to 3 (Hard Rule 2 is enforced in code, not trust); if it invents a bucket cal
 
 The extension has no server. Your API key lives in `chrome.storage.local` — a small
 private database Chrome gives each extension, stored on your machine only. Calls go
-straight from your browser to Anthropic/OpenAI, or to **Ollama** (an app that runs
-models locally — free, private, no key at all). That's why the free tier costs us
-nothing to operate.
+straight from your browser to your chosen provider:
+
+- **OpenRouter** (the default) — one key, one bill, 100+ models from many labs behind
+  it. Good default for a beginner: you're not locked into picking "the right" provider
+  up front, and some models there are free.
+- **Anthropic / OpenAI directly** — paste a key if you already have an account with
+  either and prefer to use it directly.
+- **Ollama** — an app that runs models locally on your machine. Free, private, no key
+  at all.
+
+That's why the free tier costs us nothing to operate — the bill (if any) goes straight
+from you to your chosen provider; we never sit in the middle of it.
 
 ## File-by-file
 
@@ -63,9 +72,10 @@ nothing to operate.
 | `lib/workflow.js` | The 5-phase engine: spec-exact strings, JSON parsing, validators | The "model proposes, code disposes" layer. |
 | `lib/llm.js` | The one and only door to AI providers | Friendly errors ("Is Ollama running?"), token counting for the Settings page. |
 | `lib/patterns.js` | The blocker log + weekly "Procrastination DNA" review | Pure counting — deliberately not an AI call. Counting is free. |
-| `settings.html/js` | Provider, key, schedule, nudge toggle, usage, weekly DNA | "Test connection" button so setup failures are obvious in 5 seconds. |
+| `lib/dictation.js` | Voice-to-text for any textarea, via the browser's built-in Web Speech API | No key, no server, no manifest permission — Chrome/Edge handle the mic prompt like any website would. Purely additive: typing always still works. |
+| `settings.html/js` | Provider, key, model picker, schedule, nudge toggle, usage, weekly DNA | Model picker is a plain-language dropdown of live-verified OpenRouter models (+ a Custom escape hatch); a "Using: …" line always shows the exact slug being sent. "Test connection" button so setup failures are obvious in 5 seconds. |
 | `prompts/system-prompt.md` | The encoded workflow — the strategy document the AI follows | Edit THIS to change the AI's behavior. Never edit behavior by scattering prompt fragments through code. |
-| `tests/` | 27 checks that run in plain Node | Protocol strings are tested character-for-character — the spec's words are load-bearing. |
+| `tests/` | 34 checks that run in plain Node | Protocol strings are tested character-for-character — the spec's words are load-bearing. |
 
 ## How to test it like a developer
 
@@ -87,6 +97,13 @@ success bar is that the loop closes daily — not that the code is clever.
    run this daily; the validators are what make cheap safe.
 4. **Carried tasks auto-seed tomorrow's dump.** Closing the loop is only honest if
    yesterday's leftovers show up this morning by default.
+5. **Dictation is additive, never load-bearing.** The mic button is a faster on-ramp
+   for the exact moment typing is friction (dumping a stream of consciousness), but
+   every dictation-enabled textarea is a normal textarea underneath — on a browser
+   without speech support, or if the mic is denied, typing works exactly as if the
+   button were never there. Every "wipe this part of the screen" code path also stops
+   any live dictation first, so a mic session can never keep listening in the
+   background after its textarea is gone.
 
 ## Glossary
 
@@ -96,4 +113,7 @@ success bar is that the loop closes daily — not that the code is clever.
 - **State machine** — code that's always in exactly one named state, with defined moves between states.
 - **BYO key** — you supply your own AI provider key; the product ships no server.
 - **Ollama** — free app that runs open models locally on your machine.
+- **OpenRouter** — one API that proxies 100+ models from many providers behind a
+  single key and a single bill.
 - **Strict JSON** — machine-readable structured output we can validate, instead of prose we'd have to guess at.
+- **Web Speech API** — the browser's built-in speech-to-text. Chrome's implementation sends audio to Google's speech service for transcription (cloud-based, not on-device) but needs no API key of its own and costs nothing to use — separate entirely from your OpenRouter/Anthropic/OpenAI/Ollama key.

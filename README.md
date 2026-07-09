@@ -27,16 +27,20 @@ procrastination patterns week over week.
 2. Open `chrome://extensions`, toggle **Developer mode** (top right).
 3. Click **Load unpacked** → select the `extension/` folder.
 4. Click the LOOP toolbar icon → the sidebar opens.
-5. Gear icon → Settings → pick a provider:
-   - **Anthropic / OpenAI** — paste your own API key (stored only on your device), or
+5. Gear icon → Settings → pick a provider (OpenRouter is preselected):
+   - **OpenRouter** (recommended) — one key, 100+ models (Claude, GPT, Llama, and more).
+     Free account at [openrouter.ai](https://openrouter.ai) → Keys → Create Key. Pick a
+     model from a plain-language dropdown (fast/cheap → most capable, plus a free tier) —
+     no slugs to memorize; a "Custom…" option accepts any slug for power users.
+   - **Anthropic / OpenAI** — paste your own key if you already have one with them.
    - **Ollama** — free local inference, zero cost (`ollama serve` must be running).
-6. Type your first brain dump. Hit **That's everything →**.
+6. Type — or tap the 🎙 mic and just talk — your first brain dump. Hit **That's everything →**.
 
 ## The daily loop
 
 | Phase | You | LOOP |
 |---|---|---|
-| 1 · Dump | Empty your head, messy is fine | "Got it. Is there more? Keep going." |
+| 1 · Dump | Empty your head — type or 🎙 talk, messy is fine | "Got it. Is there more? Keep going." |
 | 2 · Triage | Review the table | Buckets everything (TODAY / WEEK / SOMEDAY / DELETE) + names each task's hidden blocker |
 | 3 · Commit | Confirm | Picks exactly ONE #1 task: first action, definition of done, estimate |
 | 4 · Execute | `starting` / `done` / `stuck` / `procrastinating` | Protocol responses. Stuck? It shrinks the step. Idle 20 min? A gentle nudge. |
@@ -46,7 +50,7 @@ procrastination patterns week over week.
 
 ```bash
 cd extension
-npm test          # 27 tests: state machine, protocol strings, validators
+npm test          # 34 tests: state machine, protocol strings, validators
 ```
 
 No build step. No frameworks. Vanilla ES modules, loaded directly by Chrome.
@@ -56,5 +60,6 @@ No build step. No frameworks. Vanilla ES modules, loaded directly by Chrome.
 1. One task at a time. 2. Never more than 3 sub-steps. 3. If stuck, shrink the task.
 4. No moralizing. 5. Close before you open. 6. One screen max. 7. Record every blocker.
 
-See [`CLAUDE.md`](CLAUDE.md) for working conventions and
-[`docs/BUILD-GUIDE.md`](docs/BUILD-GUIDE.md) for the plain-language tour of how it all works.
+See [`CLAUDE.md`](CLAUDE.md) for working conventions,
+[`docs/BUILD-GUIDE.md`](docs/BUILD-GUIDE.md) for the plain-language tour of how it all works,
+and [`docs/TESTING.md`](docs/TESTING.md) for a full local test walkthrough.

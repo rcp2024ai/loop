@@ -9,7 +9,7 @@ Triage & Decode → Commit to One → Execute & Check-In → Close the Loop.
 - **Extension**: Manifest V3, vanilla JS ES modules, Chrome Side Panel API
 - **Backend (Phase 2)**: Python FastAPI, PostgreSQL, Redis
 - **Hosting**: Hostinger VPS
-- **AI**: BYO API key (Anthropic, OpenAI, local Ollama)
+- **AI**: BYO API key (OpenRouter — default — Anthropic, OpenAI, or local Ollama)
 - **Marketing**: WordPress/Divi 5 on betterwayai.com subdomain
 
 ## Standards & Conventions
