@@ -21,6 +21,7 @@ async function init() {
 
   syncProviderRows();
   $('provider').addEventListener('change', syncProviderRows);
+  $('model').addEventListener('input', updateEffectiveModel);
   $('btn-save').addEventListener('click', save);
   $('btn-test').addEventListener('click', test);
 
@@ -35,6 +36,20 @@ function syncProviderRows() {
   $('row-key').style.display = p === 'ollama' ? 'none' : '';
   $('row-ollama').style.display = p === 'ollama' ? '' : 'none';
   $('model').placeholder = DEFAULT_MODELS[p] || '';
+  updateEffectiveModel();
+}
+
+// The Model field's placeholder text (gray) can look identical to a real
+// typed value at a glance — that exact confusion is what caused a bad
+// hardcoded default to go unnoticed until it 404'd. Spell out, in plain
+// text, the literal string that will actually be sent.
+function updateEffectiveModel() {
+  const p = $('provider').value;
+  const typed = $('model').value.trim();
+  const effective = typed || DEFAULT_MODELS[p] || '(none set)';
+  $('model-effective').textContent = typed
+    ? `Using: ${effective}`
+    : `Using: ${effective} (default — nothing typed above)`;
 }
 
 function collect() {

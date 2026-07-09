@@ -80,7 +80,9 @@ This exercises every phase in one sitting.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | "API key rejected" | Typo, or a key from the wrong provider | Re-copy the key; make sure the selected Provider matches where it came from |
+| "Model not recognized by the provider" / "Provider error (HTTP 404)" | The model slug doesn't exist (typo, or the provider retired/renamed it) | Settings → check the "Using: …" line under Model — that's the *exact* string being sent. For OpenRouter, confirm it's still listed at openrouter.ai/models and paste a current one into the Model field |
 | "Could not reach Ollama" | `ollama serve` isn't running | Open a terminal, run `ollama serve`, click Test connection again |
+| "Model not found locally" (Ollama) | The model was never pulled | Run `ollama pull <model>` for whatever's set in Settings → Model |
 | Nothing happens after "That's everything" | Network blocked, provider down, or bad key | Settings → Test connection to isolate it |
 | Sidebar looks unstyled / broken | Loaded the wrong folder | The Load-unpacked target must directly contain `manifest.json` |
 

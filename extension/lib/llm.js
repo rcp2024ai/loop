@@ -11,9 +11,12 @@ export const DEFAULT_MODELS = {
   openai: 'gpt-4o-mini',
   // OpenRouter proxies 100+ models behind one key, addressed as
   // "provider/model". This default is a solid, inexpensive general model —
-  // browse current options (including free ones, suffixed ":free") at
-  // openrouter.ai/models and paste any slug into the Model field.
-  openrouter: 'anthropic/claude-3.5-haiku',
+  // verified live against https://openrouter.ai/api/v1/models (2026-07-09).
+  // Catalogs drift over time; browse current options (including free ones,
+  // suffixed ":free") at openrouter.ai/models and paste any slug into the
+  // Model field. A bad/retired slug surfaces as a clear "model not found"
+  // error (see post() below), not a silent failure.
+  openrouter: 'anthropic/claude-haiku-4.5',
   ollama: 'llama3.2'
 };
 
@@ -68,7 +71,8 @@ export function makeLlm(settings, onUsage) {
           max_tokens: 2048,
           system,
           messages: [{ role: 'user', content: user }]
-        }
+        },
+        settings.provider
       );
       onUsage?.(res.usage?.input_tokens || 0, res.usage?.output_tokens || 0);
       return (res.content || []).map((b) => b.text || '').join('');
@@ -96,7 +100,7 @@ export function makeLlm(settings, onUsage) {
           { role: 'system', content: system },
           { role: 'user', content: user }
         ]
-      });
+      }, settings.provider);
       onUsage?.(
         res.usage?.prompt_tokens || 0,
         res.usage?.completion_tokens || 0
@@ -116,7 +120,8 @@ export function makeLlm(settings, onUsage) {
           { role: 'system', content: system },
           { role: 'user', content: user }
         ]
-      }
+      },
+      'ollama'
     );
     onUsage?.(res.prompt_eval_count || 0, res.eval_count || 0);
     return res.message?.content || '';
@@ -131,7 +136,7 @@ function requireKey(settings) {
   }
 }
 
-async function post(url, headers, body) {
+async function post(url, headers, body, providerHint) {
   let res;
   try {
     res = await fetch(url, {
@@ -151,6 +156,19 @@ async function post(url, headers, body) {
     const text = await res.text().catch(() => '');
     if (res.status === 401 || res.status === 403) {
       throw new LlmError('API key rejected. Check it in Settings.', text);
+    }
+    if (res.status === 404) {
+      // Nearly always "model not found" (not a bad URL — we control those).
+      // Providers' catalogs drift over time; a stale slug fails exactly
+      // this way, so make the fix obvious rather than generic.
+      throw new LlmError(
+        providerHint === 'ollama'
+          ? 'Model not found locally. Run `ollama pull <model>` for the model set in Settings → Model, then retry.'
+          : `Model not recognized by the provider. Check the exact slug in Settings → Model${
+              providerHint === 'openrouter' ? ' — current ones are listed at openrouter.ai/models' : ''
+            }.`,
+        text
+      );
     }
     if (res.status === 429) {
       throw new LlmError('Rate limited by the provider. Wait a minute and retry.', text);
