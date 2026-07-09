@@ -10,12 +10,14 @@ import {
 import * as W from './lib/workflow.js';
 import { makeLlm, LlmError } from './lib/llm.js';
 import { addEntries, weeklyReview } from './lib/patterns.js';
+import { attachDictation } from './lib/dictation.js';
 
 const store = new Store(chrome.storage.local);
 let db = null;            // { state, patterns, history, settings, usage }
 let busy = false;
 let timerId = null;
 let flash = null;         // one-shot message rendered into the next view
+let dictationStoppers = []; // active attachDictation() cleanup fns for this view
 
 init();
 
@@ -80,6 +82,7 @@ async function guard(fn) {
 
 function render() {
   stopTimer();
+  stopAllDictation();
   renderNudge();
   const v = document.getElementById('view');
   const c = document.getElementById('cmdbar');
@@ -124,6 +127,23 @@ function showBusy(label) {
   v.append(h('div', { class: 'spin' }, label));
 }
 
+// Wraps a textarea with a mic button + status line so the user can dictate
+// instead of typing — the whole reason this exists: typing is friction
+// exactly when the point is to get thoughts out as fast as they arrive.
+// Releases the mic automatically whenever the view changes (see render()).
+function withDictation(textarea) {
+  const status = h('div', { class: 'dictate-status' });
+  const mic = h('button', { class: 'mic-btn', type: 'button', title: 'Click to dictate' }, '🎙');
+  const row = h('div', { class: 'dictate-row' }, textarea, mic);
+  dictationStoppers.push(attachDictation(textarea, mic, status));
+  return h('div', {}, row, status);
+}
+
+function stopAllDictation() {
+  for (const stop of dictationStoppers) stop();
+  dictationStoppers = [];
+}
+
 // --- DUMP -------------------------------------------------------------------
 
 function renderDump(v, c) {
@@ -138,7 +158,7 @@ function renderDump(v, c) {
       'Everything in your head. Messy is fine. Half-sentences are fine.'));
   }
   const ta = h('textarea', { class: 'dump', placeholder: 'Dump everything here…' });
-  v.append(ta);
+  v.append(withDictation(ta));
   c.append(
     btn('Dump', 'blue', () => {
       if (!ta.value.trim()) return;
@@ -271,6 +291,10 @@ function renderFocus(v, c) {
 }
 
 function protocolSay(text, cool = false) {
+  // #protocol is the one place outside render() that gets wiped directly
+  // (e.g. the stuck-textarea's dictation row lives here) — stop any live
+  // mic before discarding whatever DOM was hosting it.
+  stopAllDictation();
   const p = document.getElementById('protocol');
   if (!p) return;
   p.classList.remove('hidden');
@@ -308,7 +332,7 @@ async function cmdStuck() {
   protocolSay(W.RESPONSES.stuckAsk);
   const p = document.getElementById('protocol');
   const ta = h('textarea', { placeholder: "What's in the way?" });
-  p.append(ta, h('div', { class: 'cmdbar' },
+  p.append(withDictation(ta), h('div', { class: 'cmdbar' },
     btn('Shrink it', 'blue', async () => {
       await guard(async () => {
         const res = await W.runStuck(llm(), db.state.currentTask, ta.value || '(no detail given)');
@@ -363,7 +387,7 @@ function renderClose(v, c) {
   ta.value = seed;
   v.append(h('div', { class: 'hint' },
     'Say what really happened — closed, half-done, untouched. No judgment, just data.'));
-  v.append(ta);
+  v.append(withDictation(ta));
   c.append(
     btn('← Back', 'ghost', () => setState({ ...db.state, phase: db.state.currentTask ? 'FOCUS' : 'TRIAGE' })),
     btn('Close the loop →', 'primary', () => doClose(ta.value))
@@ -380,6 +404,9 @@ async function doClose(accomplished) {
 }
 
 function renderCloseSummary(res) {
+  // Replaces the view directly (not via render()) — the close textarea's
+  // dictation row is about to be discarded, so stop it first.
+  stopAllDictation();
   const v = document.getElementById('view');
   const c = document.getElementById('cmdbar');
   v.replaceChildren();

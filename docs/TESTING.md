@@ -37,12 +37,20 @@ Click the **⚙ gear icon** at the top of the sidebar — that opens the full Se
 
 This exercises every phase in one sitting.
 
-1. **Dump.** The sidebar opens on "Phase 1 — Brain dump". Paste something messy —
-   real is better than tidy:
+1. **Dump.** The sidebar opens on "Phase 1 — Brain dump". Type something messy — or
+   tap the **🎙 mic button** next to the textarea and just talk (Chrome will ask for
+   microphone access the first time; click Allow). Either way, real is better than tidy:
    > fix the gazoo routing bug, write readme for odin, update landing page hero, email the supplier about pricing, learn more about the new claude model, renew the domain
 
    Click **Dump**. It replies "Got it. Is there more? Keep going." — add another line
    if you like, then click **That's everything →**.
+
+   *Dictation notes:* the mic button turns red and pulses while listening; tap it again
+   to stop (it also auto-stops after a few seconds of silence). It only works in
+   Chrome/Edge — Firefox has no built-in speech API, so the button disables itself
+   there and typing is the only path. If the mic doesn't work for any reason, your
+   operating system's own dictation works in this textarea too, with zero setup:
+   **Windows** → Win+H, **Mac** → tap Fn twice (or your configured dictation shortcut).
 
 2. **Triage.** Within a few seconds, a table appears: every item bucketed
    TODAY / WEEK / SOMEDAY / DELETE, with a hidden-blocker tag on TODAY items (e.g. a
@@ -85,6 +93,8 @@ This exercises every phase in one sitting.
 | "Model not found locally" (Ollama) | The model was never pulled | Run `ollama pull <model>` for whatever's set in Settings → Model |
 | Nothing happens after "That's everything" | Network blocked, provider down, or bad key | Settings → Test connection to isolate it |
 | Sidebar looks unstyled / broken | Loaded the wrong folder | The Load-unpacked target must directly contain `manifest.json` |
+| Mic button is grayed out | Browser has no speech API (e.g. Firefox) | Use Chrome or Edge for dictation, or type normally — nothing else is affected |
+| "Mic blocked" after tapping 🎙 | Denied the browser's mic permission prompt | Click the site/extension info icon in Chrome's address-bar area, allow Microphone, reload |
 
 ## Automated tests (the code itself, not the UI)
 
@@ -94,7 +104,10 @@ npm test
 ```
 
 Covers the state machine, the spec-exact protocol strings, the JSON validators, and
-provider selection — currently 30+ checks, all fast, no network calls.
+provider selection — currently 34 checks, all fast, no network calls. Dictation itself
+is a real-browser feature (Web Speech API) with no headless equivalent in this test
+runner, so its start/stop/transcribe behavior is verified by hand per the walkthrough
+above, not by `npm test`.
 
 ## The real test
 

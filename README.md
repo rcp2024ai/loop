@@ -32,13 +32,13 @@ procrastination patterns week over week.
      Free account at [openrouter.ai](https://openrouter.ai) → Keys → Create Key.
    - **Anthropic / OpenAI** — paste your own key if you already have one with them.
    - **Ollama** — free local inference, zero cost (`ollama serve` must be running).
-6. Type your first brain dump. Hit **That's everything →**.
+6. Type — or tap the 🎙 mic and just talk — your first brain dump. Hit **That's everything →**.
 
 ## The daily loop
 
 | Phase | You | LOOP |
 |---|---|---|
-| 1 · Dump | Empty your head, messy is fine | "Got it. Is there more? Keep going." |
+| 1 · Dump | Empty your head — type or 🎙 talk, messy is fine | "Got it. Is there more? Keep going." |
 | 2 · Triage | Review the table | Buckets everything (TODAY / WEEK / SOMEDAY / DELETE) + names each task's hidden blocker |
 | 3 · Commit | Confirm | Picks exactly ONE #1 task: first action, definition of done, estimate |
 | 4 · Execute | `starting` / `done` / `stuck` / `procrastinating` | Protocol responses. Stuck? It shrinks the step. Idle 20 min? A gentle nudge. |
@@ -48,7 +48,7 @@ procrastination patterns week over week.
 
 ```bash
 cd extension
-npm test          # 27 tests: state machine, protocol strings, validators
+npm test          # 34 tests: state machine, protocol strings, validators
 ```
 
 No build step. No frameworks. Vanilla ES modules, loaded directly by Chrome.
