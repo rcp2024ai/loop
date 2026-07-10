@@ -62,4 +62,5 @@ No build step. No frameworks. Vanilla ES modules, loaded directly by Chrome.
 
 See [`CLAUDE.md`](CLAUDE.md) for working conventions,
 [`docs/BUILD-GUIDE.md`](docs/BUILD-GUIDE.md) for the plain-language tour of how it all works,
-and [`docs/TESTING.md`](docs/TESTING.md) for a full local test walkthrough.
+[`docs/TESTING.md`](docs/TESTING.md) for a full local test walkthrough,
+and [`docs/HANDOFF.md`](docs/HANDOFF.md) if you're picking up the project (architecture, version history, gotchas, roadmap).
