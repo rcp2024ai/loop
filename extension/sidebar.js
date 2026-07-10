@@ -9,8 +9,17 @@ import {
 } from './lib/state.js';
 import * as W from './lib/workflow.js';
 import { makeLlm, LlmError } from './lib/llm.js';
-import { addEntries, weeklyReview } from './lib/patterns.js';
+import { addEntries, dnaBars } from './lib/patterns.js';
+import { dnaCard } from './lib/dna-view.js';
 import { attachDictation } from './lib/dictation.js';
+
+// A realistic messy dump for the first-run "Try an example" button — the
+// fastest way to show what triage does (buckets + hidden blockers) without
+// making a cold new user compose their own first.
+const EXAMPLE_DUMP =
+  'finish the Q3 proposal, book the dentist, that podcast idea from March, ' +
+  'reply to Sarah about the collab, fix the checkout bug, renew the domain, ' +
+  'read the pricing book, start a YouTube channel, do my taxes';
 
 const store = new Store(chrome.storage.local);
 let db = null;            // { state, patterns, history, settings, usage }
@@ -148,7 +157,13 @@ function stopAllDictation() {
 
 function renderDump(v, c) {
   v.append(h('div', { class: 'eyebrow' }, 'Phase 1 — Brain dump'));
-  if (db.state.dumpBuffer.length) {
+  const ta = h('textarea', { class: 'dump', placeholder: 'Dump everything here…' });
+  // First run — never dumped, never closed a loop: show a welcome that
+  // explains LOOP in one glance and offers a one-tap example.
+  const firstRun = db.history.length === 0 && db.state.dumpBuffer.length === 0;
+  if (firstRun) {
+    v.append(welcomeCard(ta));
+  } else if (db.state.dumpBuffer.length) {
     v.append(h('div', { class: 'dumplog' },
       ...db.state.dumpBuffer.map((t) => h('div', { class: 'chunk' }, t))
     ));
@@ -157,7 +172,6 @@ function renderDump(v, c) {
     v.append(h('div', { class: 'hint' },
       'Everything in your head. Messy is fine. Half-sentences are fine.'));
   }
-  const ta = h('textarea', { class: 'dump', placeholder: 'Dump everything here…' });
   v.append(withDictation(ta));
   c.append(
     btn('Dump', 'blue', () => {
@@ -437,15 +451,12 @@ function renderCloseSummary(res) {
   // Weekly review, if the background worker flagged it due.
   chrome.storage.local.get('weeklyReviewDue').then(({ weeklyReviewDue }) => {
     if (!weeklyReviewDue) return;
-    const wr = weeklyReview(db.patterns);
-    if (!wr.top.length) return;
-    const box = h('div', { class: 'review' },
+    const dna = dnaBars(db.patterns);
+    if (!dna.bars.length) return;
+    v.append(h('div', { class: 'review' },
       h('div', { class: 'eyebrow' }, 'Your procrastination DNA — this week'),
-      ...wr.top.map((t) => h('div', { class: 'bar' },
-        h('span', {}, t.label), h('span', {}, `×${t.count}`))),
-      h('div', { class: 'change' }, `One change: ${wr.proposedChange}`)
-    );
-    v.append(box);
+      dnaCard(dna)
+    ));
     chrome.storage.local.set({ weeklyReviewDue: false });
   });
 
@@ -483,6 +494,35 @@ function field(label, value, cls = '') {
   return h('div', { class: `field ${cls}` },
     h('div', { class: 'label' }, label),
     h('div', { class: 'value' }, value));
+}
+
+// First-run welcome: one mentor-toned line, the 5-phase flow shown visually,
+// a tease of the DNA payoff, and a one-tap example that fills the dump box so
+// a brand-new user sees triage do something impressive immediately.
+function welcomeCard(ta) {
+  const steps = ['Dump', 'Triage', 'Commit', 'Execute', 'Close'];
+  const flow = h('div', { class: 'flow' });
+  steps.forEach((s, i) => {
+    flow.append(h('span', { class: 'flow-step' }, s));
+    if (i < steps.length - 1) flow.append(h('span', { class: 'flow-arrow' }, '→'));
+  });
+  const cta = h('button', {
+    class: 'btn blue welcome-cta',
+    onclick: () => {
+      ta.value = EXAMPLE_DUMP;
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+      ta.focus();
+    }
+  }, 'Try it with an example');
+  return h('div', { class: 'welcome' },
+    h('div', { class: 'welcome-title' }, 'Welcome — this is LOOP'),
+    h('div', { class: 'welcome-sub' },
+      'Empty your head below. I turn the pile into one clear next task — then again tomorrow.'),
+    flow,
+    h('div', { class: 'welcome-sub dim' },
+      'After a few days I show your #1 procrastination trigger — and one change to beat it.'),
+    cta
+  );
 }
 
 function btn(label, kind, onclick, disabled = false) {

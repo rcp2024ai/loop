@@ -6,7 +6,7 @@ import {
   validateTriage, validateCommit, validateStuck, validateClose,
   validateInterrupt, runTriage, runCommit
 } from '../lib/workflow.js';
-import { weeklyReview } from '../lib/patterns.js';
+import { weeklyReview, dnaBars } from '../lib/patterns.js';
 
 // --- Protocol strings are spec-exact (section 4 — do not drift) -------------
 
@@ -149,4 +149,25 @@ test('weeklyReview counts recent blockers and proposes exactly one change', () =
   assert.equal(wr.totalStalls, 3);
   assert.equal(wr.top[0].blocker, 'NO_STAKES');
   assert.ok(wr.proposedChange);
+});
+
+test('dnaBars scales the top bar to 100% and assigns a color per blocker', () => {
+  const day = new Date().toISOString().slice(0, 10);
+  const patterns = [
+    { day, task: 'a', blocker: 'NO_STAKES' },
+    { day, task: 'b', blocker: 'NO_STAKES' },
+    { day, task: 'c', blocker: 'TOO_BIG' }
+  ];
+  const { bars } = dnaBars(patterns);
+  assert.equal(bars[0].blocker, 'NO_STAKES');
+  assert.equal(bars[0].pct, 100);      // most frequent → full width
+  assert.equal(bars[1].pct, 50);       // half as frequent → half width
+  assert.match(bars[0].color, /^#[0-9A-Fa-f]{6}$/);
+  assert.notEqual(bars[0].color, bars[1].color);
+});
+
+test('dnaBars is empty and safe when there is no pattern data', () => {
+  const { bars, proposedChange } = dnaBars([]);
+  assert.deepEqual(bars, []);
+  assert.equal(proposedChange, null);
 });

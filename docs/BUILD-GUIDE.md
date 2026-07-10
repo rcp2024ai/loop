@@ -71,11 +71,12 @@ from you to your chosen provider; we never sit in the middle of it.
 | `lib/state.js` | The state machine + saving/loading | Day rollover: unfinished TODAY items are auto-carried into tomorrow's dump. |
 | `lib/workflow.js` | The 5-phase engine: spec-exact strings, JSON parsing, validators | The "model proposes, code disposes" layer. |
 | `lib/llm.js` | The one and only door to AI providers | Friendly errors ("Is Ollama running?"), token counting for the Settings page. |
-| `lib/patterns.js` | The blocker log + weekly "Procrastination DNA" review | Pure counting — deliberately not an AI call. Counting is free. |
+| `lib/patterns.js` | The blocker log + weekly "Procrastination DNA" review | Pure counting — deliberately not an AI call. Counting is free. `dnaBars()` adds bar widths + colors as a tested, pure view-model. |
+| `lib/dna-view.js` | The shared DNA visual (headline + color bars + "one change" card) | One DOM builder used by both Settings and the sidebar's weekly review, so they render identically. Pure DOM — no chrome APIs. |
 | `lib/dictation.js` | Voice-to-text for any textarea, via the browser's built-in Web Speech API | No key, no server, no manifest permission — Chrome/Edge handle the mic prompt like any website would. Purely additive: typing always still works. |
 | `settings.html/js` | Provider, key, model picker, schedule, nudge toggle, usage, weekly DNA | Model picker is a plain-language dropdown of live-verified OpenRouter models (+ a Custom escape hatch); a "Using: …" line always shows the exact slug being sent. "Test connection" button so setup failures are obvious in 5 seconds. |
 | `prompts/system-prompt.md` | The encoded workflow — the strategy document the AI follows | Edit THIS to change the AI's behavior. Never edit behavior by scattering prompt fragments through code. |
-| `tests/` | 34 checks that run in plain Node | Protocol strings are tested character-for-character — the spec's words are load-bearing. |
+| `tests/` | 36 checks that run in plain Node | Protocol strings are tested character-for-character — the spec's words are load-bearing. |
 
 ## How to test it like a developer
 
